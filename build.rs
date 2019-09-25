@@ -1,10 +1,34 @@
+#[derive(Debug)]
+struct IgnoreMacros(std::collections::HashSet<&'static str>);
+
+impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
+    fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        if self.0.contains(name) {
+            bindgen::callbacks::MacroParsingBehavior::Ignore
+        } else {
+            bindgen::callbacks::MacroParsingBehavior::Default
+        }
+    }
+}
+
 fn main() {
 
     let pkg = pkg_config::probe_library("vips").expect("Could not find libvips");
 
-    let out_path = std::path::Path::new("src/ffi.rs");
+    let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("bindings.rs");
 
-    if out_path.exists() { return; }
+    let ignored_macros = IgnoreMacros(
+        vec![
+            "FP_INFINITE",
+            "FP_NAN",
+            "FP_NORMAL",
+            "FP_SUBNORMAL",
+            "FP_ZERO",
+        ]
+        .into_iter()
+        .collect(),
+    );
+
 
     let mut builder = bindgen::Builder::default();
 
@@ -20,6 +44,8 @@ fn main() {
         .impl_debug(true)
         .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false })
         .header_contents("wrapper.h", "#include \"vips/vips.h\"")
+        .parse_callbacks(Box::new(ignored_macros))
+        .rustfmt_bindings(true)
         .generate()
         .unwrap();
 
