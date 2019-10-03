@@ -12,29 +12,21 @@ impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
 }
 
 fn main() {
-
     let pkg = pkg_config::probe_library("vips").expect("Could not find libvips");
+
+    // if std::path::Path::new("src/ffi.ref.rs").exists() {
+    //     return;
+    // }
 
     let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("bindings.rs");
 
     let ignored_macros = IgnoreMacros(
-        vec![
-            "FP_INFINITE",
-            "FP_NAN",
-            "FP_NORMAL",
-            "FP_SUBNORMAL",
-            "FP_ZERO",
-        ]
-        .into_iter()
-        .collect(),
+        vec!["FP_INFINITE", "FP_NAN", "FP_NORMAL", "FP_SUBNORMAL", "FP_ZERO"].into_iter().collect(),
     );
-
 
     let mut builder = bindgen::Builder::default();
 
-    for path in pkg.include_paths.iter()
-        .filter_map(|p| p.to_str()) {
-        
+    for path in pkg.include_paths.iter().filter_map(|p| p.to_str()) {
         builder = builder.clang_arg("-I");
         builder = builder.clang_arg(path);
     }
@@ -50,5 +42,4 @@ fn main() {
         .unwrap();
 
     bindings.write_to_file(out_path).unwrap();
-
 }
