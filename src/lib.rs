@@ -1,3 +1,9 @@
+
+#[cfg(feature = "docs-rs")]
+#[path = "ffi.ref.rs"]
+mod ffi;
+
+#[cfg(not(feature = "docs-rs"))]
 #[allow(non_upper_case_globals, non_camel_case_types, non_snake_case, unused, improper_ctypes)]
 mod ffi;
 

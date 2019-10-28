@@ -11,12 +11,13 @@ impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
     }
 }
 
+
+#[cfg(feature = "docs-rs")]
+fn main() {}
+
+#[cfg(not(feature = "docs-rs"))]
 fn main() {
     let pkg = pkg_config::probe_library("vips").expect("Could not find libvips");
-
-    // if std::path::Path::new("src/ffi.ref.rs").exists() {
-    //     return;
-    // }
 
     let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("bindings.rs");
 

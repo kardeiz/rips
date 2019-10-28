@@ -1,6 +1,6 @@
 [package]
 name = "rips"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Jacob Brown <kardeiz@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -17,3 +17,8 @@ libc = "0.2.62"
 pkg-config = "0.3.16"
 bindgen = "0.51.1"
 
+[features]
+docs-rs = []
+
+[package.metadata.docs.rs]
+features = ["docs-rs"]
